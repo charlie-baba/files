@@ -87,7 +87,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         String email = payload.getEmail();
         String oauthId = payload.getSubject();
 
-        Credential credential = flow.createAndStoreCredential(tokenResponse, oauthId);
+        flow.createAndStoreCredential(tokenResponse, oauthId);
 
         // Save or update user
         User user = userRepository.findByEmail(email)
