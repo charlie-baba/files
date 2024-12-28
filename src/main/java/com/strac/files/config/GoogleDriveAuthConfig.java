@@ -15,6 +15,10 @@ import java.util.Arrays;
 
 /**
  * @author Charles on 23/12/2024
+ *
+ * This is a bean that creates GoogleAuthorizationCodeFlow.
+ * GoogleAuthorizationCodeFlow creates and stores credentials for accessing google drive api.
+ * I made it a separate bean so that it can be Autowired/Injected anywhere it is needed.
  */
 @Configuration
 public class GoogleDriveAuthConfig {

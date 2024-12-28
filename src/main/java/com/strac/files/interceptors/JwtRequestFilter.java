@@ -19,6 +19,7 @@ import java.io.IOException;
 
 /**
  * @author Charles on 22/12/2024
+ *
  * This class intecepts any request, extracts the oauthId from the Jwt in the header
  * and adds it to the HttpServletRequest
  */

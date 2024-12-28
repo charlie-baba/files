@@ -30,6 +30,7 @@ public class DriveServiceImpl implements DriveService {
     @Autowired
     private OAuthTokenRepository tokenRepository;
 
+    // This uses the oauthId to find each user's access token and returns an instance of the user's Drive
     public Drive getDriveService(String userId) {
         if (userId == null) {
             throw new IllegalArgumentException("userId cannot be null");
