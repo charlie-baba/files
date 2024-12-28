@@ -40,7 +40,12 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         SecretKey encryptedSecKey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-        return Jwts.parserBuilder().setSigningKey(encryptedSecKey).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(encryptedSecKey)
+                .setAllowedClockSkewSeconds(5)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public boolean isTokenExpired(String token) {

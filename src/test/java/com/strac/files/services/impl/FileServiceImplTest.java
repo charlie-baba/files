@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  */
 
 @ExtendWith(MockitoExtension.class)
-class FileServiceImplTest {
+public class FileServiceImplTest {
 
     @Mock
     private UserRepository userRepository;

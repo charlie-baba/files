@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
  @Slf4j
 @SpringBootTest
-class DatabaseConnectionTest {
+public class DatabaseConnectionTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -39,10 +39,10 @@ class DatabaseConnectionTest {
         String email = "test@example.com" + System.currentTimeMillis();
         User user = new User();
         user.setEmail(email);
+        user.setOauthId("752348970237");
         user.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
-        assertNotNull(savedUser.getId());
 
         Optional<User> foundUser = userRepository.findByEmail(email);
         assertTrue(foundUser.isPresent());

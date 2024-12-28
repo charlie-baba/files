@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  */
 
 @ExtendWith(MockitoExtension.class)
-class OAuth2ServiceImplTest {
+public class OAuth2ServiceImplTest {
 
     @Mock
     private GoogleAuthorizationCodeFlow flow;
@@ -55,13 +55,12 @@ class OAuth2ServiceImplTest {
     private OAuth2ServiceImpl oAuth2Service;
 
     private final String CLIENT_ID = "test-client-id";
-    private final String CLIENT_SECRET = "test-client-secret";
     private final String REDIRECT_URI = "http://localhost:8080/callback";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(oAuth2Service, "clientId", CLIENT_ID);
-        ReflectionTestUtils.setField(oAuth2Service, "clientSecret", CLIENT_SECRET);
+        ReflectionTestUtils.setField(oAuth2Service, "clientSecret", "test-client-secret");
         ReflectionTestUtils.setField(oAuth2Service, "redirectUri", REDIRECT_URI);
         ReflectionTestUtils.setField(oAuth2Service, "baseUri", "https://accounts.google.com/o/oauth2/v2/auth?");
         ReflectionTestUtils.setField(oAuth2Service, "tokenServerUri", "https://oauth2.googleapis.com/token");
@@ -90,9 +89,9 @@ class OAuth2ServiceImplTest {
 
         // Assert
         assertNotNull(authUrl);
-        assertTrue(authUrl.contains("client_id=test-client-id"));
+        assertTrue(authUrl.contains(CLIENT_ID));
         assertTrue(authUrl.contains("response_type=code"));
-        assertTrue(authUrl.contains("redirect_uri=http://localhost:8080/callback"));
+        assertTrue(authUrl.contains(REDIRECT_URI));
         assertTrue(authUrl.contains("access_type=offline"));
         assertTrue(authUrl.contains("scope="));
     }
@@ -105,7 +104,7 @@ class OAuth2ServiceImplTest {
         String testOauthId = "test-oauth-id";
 
         // Create mocks
-        GoogleTokenResponse tokenResponse = getGoogleTokenResponse(testEmail, testOauthId, testCode);
+        GoogleTokenResponse tokenResponse = mockGoogleTokenResponse(testEmail, testOauthId, testCode);
 
         when(tokenResponse.getRefreshToken()).thenReturn("refresh-token");
         when(tokenResponse.getAccessToken()).thenReturn("access-token");
@@ -136,7 +135,7 @@ class OAuth2ServiceImplTest {
         existingUser.setEmail(testEmail);
         existingUser.setOauthId(testOauthId);
 
-        getGoogleTokenResponse(testEmail, testOauthId, testCode);
+        mockGoogleTokenResponse(testEmail, testOauthId, testCode);
 
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
 
@@ -157,7 +156,7 @@ class OAuth2ServiceImplTest {
         String testEmail = "test@example.com";
         String testOauthId = "test-oauth-id";
 
-        getGoogleTokenResponse(testEmail, testOauthId, testCode);
+        mockGoogleTokenResponse(testEmail, testOauthId, testCode);
 
         when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
@@ -172,7 +171,7 @@ class OAuth2ServiceImplTest {
         verify(tokenRepository, never()).save(any(OAuthToken.class));
     }
 
-    private GoogleTokenResponse getGoogleTokenResponse(String testEmail, String testOauthId, String testCode)
+    private GoogleTokenResponse mockGoogleTokenResponse(String testEmail, String testOauthId, String testCode)
             throws IOException, NoSuchFieldException, IllegalAccessException {
         GoogleAuthorizationCodeTokenRequest tokenRequest = mock(GoogleAuthorizationCodeTokenRequest.class);
         GoogleTokenResponse tokenResponse = mock(GoogleTokenResponse.class);

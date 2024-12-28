@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
  */
 
 @ExtendWith(MockitoExtension.class)
-class DriveServiceImplTest {
+public class DriveServiceImplTest {
 
     @Mock
     private GoogleAuthorizationCodeFlow flow;
@@ -147,7 +147,7 @@ class DriveServiceImplTest {
         UnauthorizedException exception = assertThrows(UnauthorizedException.class,
                 () -> driveService.getDriveService(USER_ID));
         assertEquals("Failed to refresh token for user "+ USER_ID, exception.getMessage());
-        assertTrue(exception.getCause() instanceof IOException);
+        assertInstanceOf(IOException.class, exception.getCause());
     }
 
     @Test
