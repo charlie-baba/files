@@ -1,4 +1,4 @@
-# Spring Boot Google Drive Integration Backend
+# Google Drive Integration Backend
 
 A Spring Boot application that provides REST APIs for Google Drive integration with OAuth 2.0 authentication.
 
