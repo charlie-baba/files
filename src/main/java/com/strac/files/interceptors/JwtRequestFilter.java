@@ -1,8 +1,7 @@
 package com.strac.files.interceptors;
 
-import com.strac.files.exceptions.UnauthorizedException;
 import com.strac.files.models.User;
-import com.strac.files.models.repositories.UserRepository;
+import com.strac.files.services.UserService;
 import com.strac.files.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,8 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,7 +30,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -40,25 +39,34 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authorizationHeader = request.getHeader("Authorization");
-        String oauthId = null;
-        String jwt = null;
+        try {
+            final String authorizationHeader = request.getHeader("Authorization");
 
-        // Extract oauthId from  token
-        if (authorizationHeader != null && authorizationHeader.startsWith(BEARER_PREFIX)) {
-            jwt = authorizationHeader.substring(BEARER_PREFIX.length());
-            oauthId = jwtUtil.extractIdFromToken(jwt);
-        }
-
-        if (oauthId != null) {
-            User user = userRepository.findByOauthId(oauthId);
-            if (user == null || !jwtUtil.validateToken(jwt, user.getOauthId())) {
-                throw new UnauthorizedException("Invalid token");
+            if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+                filterChain.doFilter(request, response);
+                return;
             }
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(oauthId, null, null);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            // Extract oauthId from  token
+            String jwt = authorizationHeader.substring(BEARER_PREFIX.length());
+            String oauthId = jwtUtil.extractIdFromToken(jwt);
+
+            if (oauthId != null) {
+                User user = userService.findUserByOauthId(oauthId);
+
+                if (user != null && jwtUtil.validateToken(jwt, user.getOauthId())) {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(oauthId, null, null);
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            return;
         }
-        filterChain.doFilter(request, response);
     }
 }
