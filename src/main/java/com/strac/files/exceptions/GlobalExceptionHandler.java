@@ -1,15 +1,17 @@
 package com.strac.files.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * @author Charles on 22/12/2024
@@ -26,7 +28,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = getStringObjectMap(ex.getMessage(), request);
         log.error(ex.getMessage(), ex);
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(body, NOT_FOUND);
     }
 
     // Handle UnauthorizedException
@@ -37,7 +39,16 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = getStringObjectMap(ex.getMessage(), request);
         log.error(ex.getMessage(), ex);
 
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(body, UNAUTHORIZED);
+    }
+
+    // Handle MaxUploadSizeExceededException
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException ex, WebRequest request) {
+        Map<String, Object> body = getStringObjectMap("File exceeds maximum upload size", request);
+        log.error("Error: {}", ex.getMessage(), ex);
+
+        return new ResponseEntity<>(body, PAYLOAD_TOO_LARGE);
     }
 
     // Handle generic exceptions
@@ -48,7 +59,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = getStringObjectMap("An error occurred", request);
         log.error(ex.getMessage(), ex);
 
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(body, INTERNAL_SERVER_ERROR);
     }
 
     private static Map<String, Object> getStringObjectMap(String message, WebRequest request) {
