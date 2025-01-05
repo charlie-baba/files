@@ -1,6 +1,5 @@
 package com.strac.files.services.impl;
 
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.RefreshTokenRequest;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;

@@ -1,6 +1,5 @@
 package com.strac.files.controllers;
 
-import com.strac.files.models.FileMetadata;
 import com.strac.files.models.dto.FileMetadataDTO;
 import com.strac.files.services.FileService;
 import com.strac.files.services.OAuth2Service;
