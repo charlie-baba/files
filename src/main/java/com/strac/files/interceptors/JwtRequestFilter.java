@@ -4,7 +4,6 @@ import com.strac.files.models.User;
 import com.strac.files.services.UserService;
 import com.strac.files.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import java.io.IOException;
  * This class intecepts any request, extracts the oauthId from the Jwt in the header
  * and adds it to the HttpServletRequest
  */
-
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -39,7 +37,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     // For every request, this checks the jwt
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+            throws IOException {
 
         try {
             final String authorizationHeader = request.getHeader("Authorization");
@@ -70,7 +68,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-            return;
         }
     }
 }

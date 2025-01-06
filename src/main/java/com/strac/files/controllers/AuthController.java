@@ -38,7 +38,13 @@ public class AuthController {
 
     // Exchange authorization code for tokens
     @GetMapping("/google/callback")
-    public ResponseEntity<String> handleCallback(@RequestParam String code) {
+    public ResponseEntity<String> handleCallback(@RequestParam(defaultValue = "") String code) {
+        if (code == null || code.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create("http://localhost:3000/auth-error"))
+                    .build();
+        }
+
         try {
             User user = authService.processGoogleCallback(code);
             String jwt = jwtUtil.generateToken(user.getOauthId());
